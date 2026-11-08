@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Referrals | Earnova</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">Earnova.</a>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="#" id="logout-link">Logout</a>
+        </nav>
+    </header>
+
+    <main class="referral-page">
+
+        <div class="referral-heading">
+            <h1>My Referral Centre</h1>
+            <p>Share genuine opportunities with your network.</p>
+        </div>
+
+        <section class="referral-banner">
+            <h2>Invite. Connect. Earn.</h2>
+            <p>Share Earnova with others and track eligible referral rewards.</p>
+        </section>
+
+        <section class="referral-stats">
+
+            <div class="referral-card">
+                <h3>Total Referrals</h3>
+                <h2 id="referral-count">0</h2>
+            </div>
+
+            <div class="referral-card">
+                <h3>Eligible Rewards</h3>
+                <h2>KSh 0.00</h2>
+            </div>
+
+        </section>
+
+        <section class="referral-link-box">
+            <h2>Your Referral Code</h2>
+
+            <div class="referral-code">
+                <input type="text" id="referral-code" readonly>
+                <button type="button" id="copy-referral">Copy Code</button>
+            </div>
+
+            <p>Share your code with friends who may be interested in Earnova.</p>
+        </section>
+
+        <section class="referral-history">
+            <h2>Referral Activity</h2>
+            <p id="referral-message">No referral activity yet.</p>
+        </section>
+
+        <p class="referral-notice">
+            Referral rewards are only earned when qualifying genuine transactions
+            generate commission. Registration alone does not guarantee rewards.
+            This is currently a demonstration system.
+        </p>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Earnova. All rights reserved.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
