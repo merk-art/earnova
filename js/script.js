@@ -7,15 +7,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Earnova JavaScript loaded successfully!");
 
+    
     // ==========================================
-    // 1. REGISTRATION SYSTEM
+    // 1. REGISTRATION SYSTEM - SUPABASE
     // ==========================================
 
     const registerForm = document.getElementById("register-form");
 
     if (registerForm) {
 
-        registerForm.addEventListener("submit", function (event) {
+        registerForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
@@ -40,113 +41,197 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const user = {
-                fullname: fullname,
-                email: email,
-                phone: phone
-            };
+            const submitButton = registerForm.querySelector('button[type="submit"]');
 
-            localStorage.setItem("earnovaUser", JSON.stringify(user));
-            sessionStorage.setItem("earnovaLoggedIn", "true");
+            try {
 
-            alert("Registration successful! Welcome to Earnova.");
+                submitButton.disabled = true;
+                submitButton.textContent = "Creating Account...";
 
-            window.location.href = "dashboard.html";
+                const { data, error } = await supabaseClient.auth.signUp({
+
+                    email: email,
+                    password: password,
+
+                    options: {
+                        data: {
+                            full_name: fullname,
+                            phone: phone
+                        }
+                    }
+
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data.session) {
+
+                    alert("Account created successfully! You can now log in.");
+
+                } else {
+
+                    alert(
+                        "Account created successfully! " +
+                        "Please check your email for a verification link " +
+                        "before logging in."
+                    );
+
+                }
+
+                window.location.href = "login.html";
+
+            } catch (error) {
+
+                console.error("Registration error:", error);
+
+                alert("Registration failed: " + error.message);
+
+            } finally {
+
+                submitButton.disabled = false;
+                submitButton.textContent = "Create Account";
+
+            }
 
         });
 
     }
 
 
+    
     // ==========================================
-    // 2. LOGIN SYSTEM - DEMO
+    // 2. LOGIN SYSTEM - SUPABASE
     // ==========================================
 
     const loginForm = document.getElementById("login-form");
 
     if (loginForm) {
 
-        loginForm.addEventListener("submit", function (event) {
+        loginForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
 
-            const savedUserText = localStorage.getItem("earnovaUser");
+            const submitButton = loginForm.querySelector('button[type="submit"]');
 
-            if (!savedUserText) {
-                alert("No account found. Please register first.");
-                return;
+            try {
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Logging in...";
+
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                alert("Welcome back! Login successful.");
+
+                window.location.href = "dashboard.html";
+
+            } catch (error) {
+
+                console.error("Login error:", error);
+
+                alert("Login failed: " + error.message);
+
+            } finally {
+
+                submitButton.disabled = false;
+                submitButton.textContent = "Login";
+
             }
-
-            const savedUser = JSON.parse(savedUserText);
-
-            if (email !== savedUser.email || password.trim() === "") {
-                alert("Please check your email and password.");
-                return;
-            }
-
-            sessionStorage.setItem("earnovaLoggedIn", "true");
-
-            alert("Welcome back, " + savedUser.fullname + "!");
-
-            window.location.href = "dashboard.html";
 
         });
 
     }
 
-
+    
     // ==========================================
-    // 3. DASHBOARD WELCOME MESSAGE
+    // 3. DASHBOARD - SUPABASE AUTHENTICATION
     // ==========================================
 
     const welcomeMessage = document.getElementById("welcome-message");
 
     if (welcomeMessage) {
 
-        const loggedIn = sessionStorage.getItem("earnovaLoggedIn");
-        const savedUserText = localStorage.getItem("earnovaUser");
+        async function loadDashboard() {
 
-        if (loggedIn !== "true" || !savedUserText) {
+            const { data: { session }, error } =
+                await supabaseClient.auth.getSession();
 
-            window.location.href = "login.html";
+            if (error || !session) {
+                window.location.replace("login.html");
+                return;
+            }
 
-        } else {
+            const { data: profile, error: profileError } =
+                await supabaseClient
+                    .from("profiles")
+                    .select("full_name, phone")
+                    .eq("id", session.user.id)
+                    .single();
 
-            const user = JSON.parse(savedUserText);
+            if (profileError) {
+                console.error("Profile loading error:", profileError);
+            }
 
-            welcomeMessage.textContent = "Welcome, " + user.fullname + "!";
+            const fullname = profile?.full_name || "Earnova Member";
+
+            welcomeMessage.textContent = "Welcome, " + fullname + "!";
 
             const memberEmail = document.getElementById("member-email");
 
             if (memberEmail) {
-                memberEmail.textContent = user.email;
+                memberEmail.textContent = session.user.email;
             }
 
         }
 
+        loadDashboard();
+
     }
 
 
+    
     // ==========================================
-    // 4. LOGOUT SYSTEM
+    // 4. LOGOUT SYSTEM - SUPABASE
     // ==========================================
 
     const logoutLink = document.getElementById("logout-link");
 
     if (logoutLink) {
 
-        logoutLink.addEventListener("click", function (event) {
+        logoutLink.addEventListener("click", async function (event) {
 
             event.preventDefault();
 
-            sessionStorage.removeItem("earnovaLoggedIn");
+            try {
 
-            alert("You have successfully logged out.");
+                const { error } = await supabaseClient.auth.signOut();
 
-            window.location.href = "login.html";
+                if (error) {
+                    throw error;
+                }
+
+                alert("You have successfully logged out.");
+
+                window.location.href = "login.html";
+
+            } catch (error) {
+
+                console.error("Logout error:", error);
+
+                alert("Could not log out: " + error.message);
+
+            }
 
         });
 
