@@ -54,11 +54,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     password: password,
 
                     options: {
-                        data: {
-                            full_name: fullname,
-                            phone: phone
-                        }
-                    }
+    emailRedirectTo: "https://merk-art.github.io/earnova/",
+
+    data: {
+        full_name: fullname,
+        phone: phone
+    }
+}
 
                 });
 
