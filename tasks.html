@@ -11,14 +11,14 @@
 <body>
 
     <header class="navbar">
-    <a href="dashboard.html" class="logo">Earnova.</a>
+        <a href="dashboard.html" class="logo">Earnova.</a>
 
-    <nav>
-        <a href="dashboard.html">Home</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="#" id="logout-link">Logout</a>
-    </nav>
-</header>
+        <nav>
+            <a href="dashboard.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="#" id="logout-link">Logout</a>
+        </nav>
+    </header>
 
     <main class="tasks-page">
 
@@ -27,37 +27,15 @@
             <p>Discover opportunities and put your skills to work.</p>
         </div>
 
-        <div class="task-grid">
+        <div class="task-grid" id="task-grid">
 
-            <div class="task-card">
-                <span class="task-category">Research</span>
-                <h2>Online Research</h2>
-                <p>Research a topic and submit a short, accurate report.</p>
-                <h3>KSh 100</h3>
-                <button type="button" class="task-btn">View Task</button>
-            </div>
-
-            <div class="task-card">
-                <span class="task-category">Writing</span>
-                <h2>Content Writing</h2>
-                <p>Write a short article following the supplied instructions.</p>
-                <h3>KSh 200</h3>
-                <button type="button" class="task-btn">View Task</button>
-            </div>
-
-            <div class="task-card">
-                <span class="task-category">Data Entry</span>
-                <h2>Data Collection</h2>
-                <p>Organise information into a simple spreadsheet.</p>
-                <h3>KSh 150</h3>
-                <button type="button" class="task-btn">View Task</button>
-            </div>
+            <p id="task-loading">Loading available tasks...</p>
 
         </div>
 
         <p class="task-notice">
-            These are demonstration tasks and sample rewards.
-            No real work or payments are currently available.
+            Tasks and rewards are currently for demonstration purposes.
+            No real payments are currently available.
         </p>
 
     </main>
@@ -67,8 +45,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
-<script src="js/script.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/script.js"></script>
 
 </body>
 </html>
