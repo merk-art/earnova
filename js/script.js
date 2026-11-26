@@ -305,51 +305,117 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
     // ==========================================
-    // 6. TASK BUTTON SYSTEM - DEMO
+    // 6. LOAD TASKS FROM SUPABASE
     // ==========================================
 
-    document.addEventListener("click", function (event) {
+    const taskGrid = document.getElementById("task-grid");
 
-        const button = event.target.closest(".task-btn");
+    if (taskGrid) {
 
-        if (!button) {
-            return;
+        async function loadTasks() {
+
+            const { data: tasks, error } = await supabaseClient
+                .from("tasks")
+                .select("id, title, description, instructions, category, reward_amount")
+                .eq("is_active", true)
+                .order("created_at", { ascending: false });
+
+            taskGrid.replaceChildren();
+
+            if (error) {
+
+                console.error("Task loading error:", error);
+
+                const message = document.createElement("p");
+                message.textContent = "Unable to load tasks. Please refresh the page.";
+                taskGrid.appendChild(message);
+
+                return;
+            }
+
+            if (!tasks || tasks.length === 0) {
+
+                const message = document.createElement("p");
+                message.textContent = "There are currently no available tasks.";
+                taskGrid.appendChild(message);
+
+                return;
+            }
+
+            const taskMap = new Map();
+
+            tasks.forEach(function (task) {
+
+                taskMap.set(String(task.id), task);
+
+                const card = document.createElement("div");
+                card.className = "task-card";
+
+                const category = document.createElement("span");
+                category.className = "task-category";
+                category.textContent = task.category.replace("_", " ");
+
+                const title = document.createElement("h2");
+                title.textContent = task.title;
+
+                const description = document.createElement("p");
+                description.textContent = task.description;
+
+                const reward = document.createElement("h3");
+                reward.textContent =
+                    "KSh " + Number(task.reward_amount).toFixed(2);
+
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "task-btn";
+                button.dataset.taskId = task.id;
+                button.textContent = "View Task";
+
+                card.appendChild(category);
+                card.appendChild(title);
+                card.appendChild(description);
+                card.appendChild(reward);
+                card.appendChild(button);
+
+                taskGrid.appendChild(card);
+
+            });
+
+            // View task instructions
+
+            taskGrid.addEventListener("click", function (event) {
+
+                const button = event.target.closest(".task-btn");
+
+                if (!button) {
+                    return;
+                }
+
+                const task = taskMap.get(button.dataset.taskId);
+
+                if (!task) {
+                    return;
+                }
+
+                alert(
+                    "EARNOVA - TASK DETAILS\n\n" +
+                    "Task: " + task.title + "\n" +
+                    "Category: " + task.category.replace("_", " ") + "\n" +
+                    "Reward: KSh " + Number(task.reward_amount).toFixed(2) +
+                    "\n\nDescription:\n" + task.description +
+                    "\n\nInstructions:\n" +
+                    (task.instructions || "No additional instructions provided.")
+                );
+
+            });
+
         }
 
-        const taskCard = button.closest(".task-card");
+        loadTasks();
 
-        if (!taskCard) {
-            alert("Task information could not be found.");
-            return;
-        }
+    }
 
-        const taskTitle = taskCard.querySelector("h2, h3, h4");
-        const taskCategory = taskCard.querySelector(".task-category");
-        const taskDescription = taskCard.querySelector("p");
-
-        const title = taskTitle
-            ? taskTitle.textContent.trim()
-            : "Earnova demonstration task";
-
-        const category = taskCategory
-            ? taskCategory.textContent.trim()
-            : "General task";
-
-        const description = taskDescription
-            ? taskDescription.textContent.trim()
-            : "This task is currently a demonstration.";
-
-        alert(
-            "EARNOVA - TASK DETAILS\n\n" +
-            "Task: " + title + "\n" +
-            "Category: " + category + "\n\n" +
-            description +
-            "\n\nThis is a demonstration task. " +
-            "Real task applications will be available " +
-            "after the platform is connected to its backend."
-        );
-
-    });
 
 });
