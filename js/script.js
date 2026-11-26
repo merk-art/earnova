@@ -7,9 +7,70 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Earnova JavaScript loaded successfully!");
 
-    
     // ==========================================
-    // 1. REGISTRATION SYSTEM - SUPABASE
+    // 1. PAGE AUTHENTICATION PROTECTION
+    // ==========================================
+
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const protectedPages = [
+        "dashboard.html",
+        "tasks.html",
+        "wallet.html",
+        "referrals.html"
+    ];
+
+    if (protectedPages.includes(currentPage)) {
+
+        async function checkAuthentication() {
+
+            const { data, error } = await supabaseClient.auth.getSession();
+
+            if (error || !data.session) {
+                window.location.replace("login.html");
+                return;
+            }
+
+            // Load dashboard profile only on dashboard.html
+            if (currentPage === "dashboard.html") {
+
+                const welcomeMessage =
+                    document.getElementById("welcome-message");
+
+                if (welcomeMessage) {
+
+                    const { data: profile, error: profileError } =
+                        await supabaseClient
+                            .from("profiles")
+                            .select("full_name, phone")
+                            .eq("id", data.session.user.id)
+                            .single();
+
+                    if (profileError) {
+                        console.error("Profile loading error:", profileError);
+                    }
+
+                    const fullname = profile?.full_name || "Earnova Member";
+
+                    welcomeMessage.textContent =
+                        "Welcome, " + fullname + "!";
+
+                    const memberEmail =
+                        document.getElementById("member-email");
+
+                    if (memberEmail) {
+                        memberEmail.textContent = data.session.user.email;
+                    }
+                }
+            }
+        }
+
+        checkAuthentication();
+    }
+
+
+    // ==========================================
+    // 2. REGISTRATION SYSTEM - SUPABASE
     // ==========================================
 
     const registerForm = document.getElementById("register-form");
@@ -24,7 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const email = document.getElementById("email").value.trim();
             const phone = document.getElementById("phone").value.trim();
             const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirm-password").value;
+            const confirmPassword =
+                document.getElementById("confirm-password").value;
 
             if (!fullname || !email || !phone || !password || !confirmPassword) {
                 alert("Please complete all required fields.");
@@ -41,12 +103,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const submitButton = registerForm.querySelector('button[type="submit"]');
+            const submitButton =
+                registerForm.querySelector('button[type="submit"]');
 
             try {
 
-                submitButton.disabled = true;
-                submitButton.textContent = "Creating Account...";
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = "Creating Account...";
+                }
 
                 const { data, error } = await supabaseClient.auth.signUp({
 
@@ -54,13 +119,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     password: password,
 
                     options: {
-    emailRedirectTo: "https://merk-art.github.io/earnova/",
+                        emailRedirectTo: "https://merk-art.github.io/earnova/",
 
-    data: {
-        full_name: fullname,
-        phone: phone
-    }
-}
+                        data: {
+                            full_name: fullname,
+                            phone: phone
+                        }
+                    }
 
                 });
 
@@ -69,17 +134,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 if (data.session) {
-
                     alert("Account created successfully! You can now log in.");
-
                 } else {
-
                     alert(
                         "Account created successfully! " +
                         "Please check your email for a verification link " +
                         "before logging in."
                     );
-
                 }
 
                 window.location.href = "login.html";
@@ -87,24 +148,23 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
 
                 console.error("Registration error:", error);
-
                 alert("Registration failed: " + error.message);
 
             } finally {
 
-                submitButton.disabled = false;
-                submitButton.textContent = "Create Account";
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Create Account";
+                }
 
             }
 
         });
-
     }
 
 
-    
     // ==========================================
-    // 2. LOGIN SYSTEM - SUPABASE
+    // 3. LOGIN SYSTEM - SUPABASE
     // ==========================================
 
     const loginForm = document.getElementById("login-form");
@@ -118,17 +178,21 @@ document.addEventListener("DOMContentLoaded", function () {
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
 
-            const submitButton = loginForm.querySelector('button[type="submit"]');
+            const submitButton =
+                loginForm.querySelector('button[type="submit"]');
 
             try {
 
-                submitButton.disabled = true;
-                submitButton.textContent = "Logging in...";
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = "Logging in...";
+                }
 
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
 
                 if (error) {
                     throw error;
@@ -141,68 +205,21 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
 
                 console.error("Login error:", error);
-
                 alert("Login failed: " + error.message);
 
             } finally {
 
-                submitButton.disabled = false;
-                submitButton.textContent = "Login";
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Login";
+                }
 
             }
 
         });
-
-    }
-
-    
-    // ==========================================
-    // 3. DASHBOARD - SUPABASE AUTHENTICATION
-    // ==========================================
-
-    const welcomeMessage = document.getElementById("welcome-message");
-
-    if (welcomeMessage) {
-
-        async function loadDashboard() {
-
-            const { data: { session }, error } =
-                await supabaseClient.auth.getSession();
-
-            if (error || !session) {
-                window.location.replace("login.html");
-                return;
-            }
-
-            const { data: profile, error: profileError } =
-                await supabaseClient
-                    .from("profiles")
-                    .select("full_name, phone")
-                    .eq("id", session.user.id)
-                    .single();
-
-            if (profileError) {
-                console.error("Profile loading error:", profileError);
-            }
-
-            const fullname = profile?.full_name || "Earnova Member";
-
-            welcomeMessage.textContent = "Welcome, " + fullname + "!";
-
-            const memberEmail = document.getElementById("member-email");
-
-            if (memberEmail) {
-                memberEmail.textContent = session.user.email;
-            }
-
-        }
-
-        loadDashboard();
-
     }
 
 
-    
     // ==========================================
     // 4. LOGOUT SYSTEM - SUPABASE
     // ==========================================
@@ -225,18 +242,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 alert("You have successfully logged out.");
 
-                window.location.href = "login.html";
+                window.location.replace("login.html");
 
             } catch (error) {
 
                 console.error("Logout error:", error);
-
                 alert("Could not log out: " + error.message);
 
             }
 
         });
-
     }
 
 
@@ -267,7 +282,6 @@ document.addEventListener("DOMContentLoaded", function () {
             referralInput.value = user.referralCode;
 
         }
-
     }
 
     if (copyReferral && referralInput) {
@@ -288,12 +302,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         });
-
     }
 
 
     // ==========================================
-    // 6. TASK BUTTON SYSTEM
+    // 6. TASK BUTTON SYSTEM - DEMO
     // ==========================================
 
     document.addEventListener("click", function (event) {
@@ -338,6 +351,5 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
     });
-
 
 });
