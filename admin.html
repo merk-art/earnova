@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Earnova</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <a href="admin.html" class="logo">Earnova. Admin</a>
+
+        <nav>
+            <a href="dashboard.html">Member Site</a>
+            <a href="#" id="admin-logout">Logout</a>
+        </nav>
+    </header>
+
+    <main class="admin-page">
+
+        <section class="admin-heading">
+            <h1>Admin Dashboard</h1>
+            <p>Manage Earnova and review member submissions.</p>
+        </section>
+
+        <section class="admin-stats">
+            <div class="task-card">
+                <h3>Total Submissions</h3>
+                <p id="total-submissions">Loading...</p>
+            </div>
+
+            <div class="task-card">
+                <h3>Pending Review</h3>
+                <p id="pending-submissions">Loading...</p>
+            </div>
+
+            <div class="task-card">
+                <h3>Approved</h3>
+                <p id="approved-submissions">Loading...</p>
+            </div>
+
+            <div class="task-card">
+                <h3>Rejected</h3>
+                <p id="rejected-submissions">Loading...</p>
+            </div>
+        </section>
+
+        <section class="admin-submissions">
+            <h2>Task Submissions</h2>
+            <p>Review the work submitted by Earnova members.</p>
+
+            <div id="admin-message"></div>
+
+            <div id="submissions-list">
+                Loading submissions...
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Earnova. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/admin.js"></script>
+
+</body>
+</html>
