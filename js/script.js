@@ -306,14 +306,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
     // ==========================================
-    // 6. LOAD TASKS FROM SUPABASE
+    // 6. LOAD TASKS AND HANDLE SUBMISSIONS
     // ==========================================
 
     const taskGrid = document.getElementById("task-grid");
 
     if (taskGrid) {
 
+        const taskMap = new Map();
+
+        // Create the task details area
+        const taskDetails = document.createElement("section");
+        taskDetails.className = "task-details";
+        taskDetails.id = "task-details";
+
+        taskGrid.insertAdjacentElement("afterend", taskDetails);
+
+        // Load available tasks from Supabase
         async function loadTasks() {
 
             const { data: tasks, error } = await supabaseClient
@@ -323,28 +334,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 .order("created_at", { ascending: false });
 
             taskGrid.replaceChildren();
+            taskMap.clear();
 
             if (error) {
 
                 console.error("Task loading error:", error);
-
-                const message = document.createElement("p");
-                message.textContent = "Unable to load tasks. Please refresh the page.";
-                taskGrid.appendChild(message);
-
+                taskGrid.textContent =
+                    "Unable to load tasks. Please refresh the page.";
                 return;
             }
 
             if (!tasks || tasks.length === 0) {
 
-                const message = document.createElement("p");
-                message.textContent = "There are currently no available tasks.";
-                taskGrid.appendChild(message);
-
+                taskGrid.textContent =
+                    "There are currently no available tasks.";
                 return;
             }
-
-            const taskMap = new Map();
 
             tasks.forEach(function (task) {
 
@@ -355,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const category = document.createElement("span");
                 category.className = "task-category";
-                category.textContent = task.category.replace("_", " ");
+                category.textContent = task.category.replaceAll("_", " ");
 
                 const title = document.createElement("h2");
                 title.textContent = task.title;
@@ -382,40 +387,168 @@ document.addEventListener("DOMContentLoaded", function () {
                 taskGrid.appendChild(card);
 
             });
+        }
 
-            // View task instructions
+        // Open task details when View Task is clicked
+        taskGrid.addEventListener("click", function (event) {
 
-            taskGrid.addEventListener("click", function (event) {
+            const button = event.target.closest(".task-btn");
 
-                const button = event.target.closest(".task-btn");
+            if (!button) {
+                return;
+            }
 
-                if (!button) {
+            const task = taskMap.get(button.dataset.taskId);
+
+            if (!task) {
+                return;
+            }
+
+            taskDetails.replaceChildren();
+
+            const heading = document.createElement("h2");
+            heading.textContent = task.title;
+
+            const description = document.createElement("p");
+            description.textContent = task.description;
+
+            const instructionsHeading = document.createElement("h3");
+            instructionsHeading.textContent = "Instructions";
+
+            const instructions = document.createElement("p");
+            instructions.textContent =
+                task.instructions || "No additional instructions provided.";
+
+            const submissionHeading = document.createElement("h3");
+            submissionHeading.textContent = "Submit Your Work";
+
+            const explanation = document.createElement("p");
+            explanation.textContent =
+                "Complete the task and enter your work below. You may also provide a link as proof.";
+
+            // Create submission form
+            const form = document.createElement("form");
+            form.id = "task-submission-form";
+
+            const workLabel = document.createElement("label");
+            workLabel.textContent = "Your completed work";
+
+            const workBox = document.createElement("textarea");
+            workBox.name = "submission_text";
+            workBox.placeholder = "Enter your answers or completed work here...";
+            workBox.rows = 7;
+
+            const proofLabel = document.createElement("label");
+            proofLabel.textContent = "Proof link (optional)";
+
+            const proofInput = document.createElement("input");
+            proofInput.type = "url";
+            proofInput.name = "proof_url";
+            proofInput.placeholder = "https://example.com/your-work";
+
+            const submitButton = document.createElement("button");
+            submitButton.type = "submit";
+            submitButton.className = "task-btn";
+            submitButton.textContent = "Submit Task";
+
+            const message = document.createElement("p");
+            message.id = "submission-message";
+
+            workLabel.appendChild(workBox);
+proofLabel.appendChild(proofInput);
+
+form.appendChild(workLabel);
+form.appendChild(proofLabel);
+            form.appendChild(submitButton);
+            form.appendChild(message);
+
+            taskDetails.appendChild(heading);
+            taskDetails.appendChild(description);
+            taskDetails.appendChild(instructionsHeading);
+            taskDetails.appendChild(instructions);
+            taskDetails.appendChild(submissionHeading);
+            taskDetails.appendChild(explanation);
+            taskDetails.appendChild(form);
+
+            taskDetails.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+            // Save the member's submission
+            form.addEventListener("submit", async function (event) {
+
+                event.preventDefault();
+
+                const submissionText = workBox.value.trim();
+                const proofUrl = proofInput.value.trim();
+
+                if (!submissionText && !proofUrl) {
+
+                    message.textContent =
+                        "Please enter your completed work or provide a proof link.";
+
                     return;
                 }
 
-                const task = taskMap.get(button.dataset.taskId);
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
 
-                if (!task) {
+                const { data: userData, error: userError } =
+                    await supabaseClient.auth.getUser();
+
+                if (userError || !userData.user) {
+
+                    message.textContent =
+                        "Your session could not be verified. Please log in again.";
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Submit Task";
                     return;
                 }
 
-                alert(
-                    "EARNOVA - TASK DETAILS\n\n" +
-                    "Task: " + task.title + "\n" +
-                    "Category: " + task.category.replace("_", " ") + "\n" +
-                    "Reward: KSh " + Number(task.reward_amount).toFixed(2) +
-                    "\n\nDescription:\n" + task.description +
-                    "\n\nInstructions:\n" +
-                    (task.instructions || "No additional instructions provided.")
-                );
+                const { error: submitError } = await supabaseClient
+                    .from("task_submissions")
+                    .insert({
+                        task_id: task.id,
+                        user_id: userData.user.id,
+                        submission_text: submissionText || null,
+                        proof_url: proofUrl || null
+                    });
+
+                if (submitError) {
+
+                    console.error("Submission error:", submitError);
+
+                    if (submitError.code === "23505") {
+
+                        message.textContent =
+                            "You have already submitted this task.";
+
+                    } else {
+
+                        message.textContent =
+                            "Submission failed. Please try again.";
+                    }
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Submit Task";
+                    return;
+                }
+
+                message.textContent =
+                    "Your work has been submitted successfully! It is now pending review.";
+
+                form.reset();
+                form.replaceWith(message);
 
             });
 
-        }
+        });
 
+        // Start loading tasks
         loadTasks();
 
     }
-
 
 });
