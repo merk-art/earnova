@@ -746,3 +746,77 @@ footer p {
         flex-direction: column;
     }
 }
+
+/* =================================
+   TASK DETAILS AND SUBMISSION FORM
+================================= */
+
+.task-details {
+    background: #ffffff;
+    padding: 30px;
+    margin: 35px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.task-details h2 {
+    color: #138b50;
+    margin-bottom: 15px;
+}
+
+.task-details h3 {
+    margin-top: 25px;
+    margin-bottom: 12px;
+}
+
+.task-details p {
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.task-details label {
+    display: block;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.task-details textarea,
+.task-details input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.task-details textarea {
+    min-height: 180px;
+    resize: vertical;
+}
+
+.task-details button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    background: #138b50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.task-details button:hover {
+    background: #0e7040;
+}
+
+#submission-message {
+    margin-top: 15px;
+    font-weight: bold;
+}
