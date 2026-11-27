@@ -820,3 +820,162 @@ footer p {
     margin-top: 15px;
     font-weight: bold;
 }
+
+/* ==========================================
+   EARNOVA ADMIN DASHBOARD
+========================================== */
+
+.admin-page {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.admin-heading {
+    margin-bottom: 30px;
+}
+
+.admin-heading h1 {
+    color: #138b50;
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.admin-heading p {
+    color: #666;
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.admin-stats .task-card {
+    padding: 25px;
+    text-align: center;
+    border-radius: 12px;
+}
+
+.admin-stats .task-card h3 {
+    font-size: 16px;
+    color: #555;
+}
+
+.admin-stats .task-card p {
+    font-size: 30px;
+    font-weight: bold;
+    color: #138b50;
+    margin-top: 12px;
+}
+
+.admin-submissions {
+    margin-top: 30px;
+}
+
+.admin-submissions h2 {
+    color: #138b50;
+    margin-bottom: 10px;
+}
+
+.admin-submission-card {
+    background: #fff;
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+    overflow-wrap: anywhere;
+}
+
+.admin-submission-card h3 {
+    color: #138b50;
+    margin-bottom: 15px;
+}
+
+.admin-submission-card h4 {
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.admin-submission-card p {
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.admin-submission-card label {
+    display: block;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.admin-submission-card textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 90px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    resize: vertical;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.admin-actions button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.approve-btn {
+    background: #138b50;
+}
+
+.approve-btn:hover {
+    background: #0e7040;
+}
+
+.reject-btn {
+    background: #dc3545;
+}
+
+.reject-btn:hover {
+    background: #b02a37;
+}
+
+#admin-message {
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+
+    .admin-page {
+        width: 94%;
+    }
+
+    .admin-heading h1 {
+        font-size: 26px;
+    }
+
+    .admin-submission-card {
+        padding: 18px;
+    }
+
+    .admin-actions {
+        flex-direction: column;
+    }
+}
