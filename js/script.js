@@ -7,7 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Earnova JavaScript loaded successfully!");
 
-    // ==========================================
+    
+                return;
+            }// ==========================================
     // 1. PAGE AUTHENTICATION PROTECTION
     // ==========================================
 
@@ -61,10 +63,29 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (memberEmail) {
                         memberEmail.textContent = data.session.user.email;
                     }
+                                }
+
+                // Check whether the logged-in user is an admin
+                const adminPanelLink =
+                    document.getElementById("admin-panel-link");
+
+                if (adminPanelLink) {
+
+                    const { data: adminRecord, error: adminError } =
+                        await supabaseClient
+                            .from("admin_users")
+                            .select("user_id")
+                            .eq("user_id", data.session.user.id)
+                            .maybeSingle();
+
+                    if (!adminError && adminRecord) {
+                        adminPanelLink.style.display = "inline";
+                    }
                 }
             }
         }
 
+        
         checkAuthentication();
     }
 
@@ -89,9 +110,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("confirm-password").value;
 
             if (!fullname || !email || !phone || !password || !confirmPassword) {
-                alert("Please complete all required fields.");
-                return;
-            }
+    alert("Please complete all required fields.");
+    return;
+}
 
             if (password !== confirmPassword) {
                 alert("Passwords do not match!");
